@@ -59,44 +59,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main);
         init();
 
-        binding.shuffleImg.setOnClickListener(view -> {
-            Collections.shuffle(topwearList);
-            Collections.shuffle(bottomwearList);
-            swipeAdapter = new TopSwipeAdapter(getApplicationContext(),topwearList);
-            binding.topPager.setAdapter(swipeAdapter);
-            swipeAdapter2 = new BottomSwipeAdapter(getApplicationContext(),bottomwearList);
-            binding.bottomPager.setAdapter(swipeAdapter2);
-        });
-
-        binding.wishImg.setOnClickListener(view -> {
-            if (topwearList.size() != 0 && bottomwearList.size() != 0) {
-                int topPos = binding.topPager.getCurrentItem();
-                int bottomPos = binding.bottomPager.getCurrentItem();
-                if (wishData == null) {
-                    viewModel.insertWishlist(new Wishlist(0,
-                            topwearList.get(topPos).getId(),
-                            bottomwearList.get(bottomPos).getId()));
-                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
-                    Toast.makeText(getApplicationContext(), "Item added to wishlist", Toast.LENGTH_SHORT).show();
-                } else {
-                    viewModel.deleteWishlist(wishData);
-                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
-                    Toast.makeText(getApplicationContext(), "Item removed from wishlist", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        pageListener();
-
-        binding.topImgPager.setOnClickListener(view -> {
-            ImageDialog();
-            flag = 0;
-        });
-
-        binding.bottomImgPager.setOnClickListener(view -> {
-            ImageDialog();
-            flag = 1;
-        });
+        clickAndPageListener();
 
     }
 
@@ -127,7 +90,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void pageListener(){
+    private void clickAndPageListener(){
+        binding.shuffleImg.setOnClickListener(view -> {
+            Collections.shuffle(topwearList);
+            Collections.shuffle(bottomwearList);
+            swipeAdapter = new TopSwipeAdapter(getApplicationContext(),topwearList);
+            binding.topPager.setAdapter(swipeAdapter);
+            swipeAdapter2 = new BottomSwipeAdapter(getApplicationContext(),bottomwearList);
+            binding.bottomPager.setAdapter(swipeAdapter2);
+            getWishData();
+        });
+
+        binding.wishImg.setOnClickListener(view -> {
+            if (topwearList.size() != 0 && bottomwearList.size() != 0) {
+                int topPos = binding.topPager.getCurrentItem();
+                int bottomPos = binding.bottomPager.getCurrentItem();
+                if (wishData == null) {
+                    viewModel.insertWishlist(new Wishlist(0,
+                            topwearList.get(topPos).getId(),
+                            bottomwearList.get(bottomPos).getId()));
+                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
+                    Toast.makeText(getApplicationContext(), "Item added to wishlist", Toast.LENGTH_SHORT).show();
+                } else {
+                    viewModel.deleteWishlist(wishData);
+                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
+                    Toast.makeText(getApplicationContext(), "Item removed from wishlist", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        binding.topImgPager.setOnClickListener(view -> {
+            ImageDialog();
+            flag = 0;
+        });
+
+        binding.bottomImgPager.setOnClickListener(view -> {
+            ImageDialog();
+            flag = 1;
+        });
+
         binding.topPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -250,9 +251,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
                     ImageDialog();
-                    // main logic
                 } else {
                     Toast.makeText(getApplicationContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

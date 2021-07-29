@@ -31,7 +31,6 @@ public class Utils {
     public static boolean checkPermission(Activity activity) {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
             return false;
         }
         return true;

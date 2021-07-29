@@ -17,7 +17,6 @@ public class ApparelViewModel extends AndroidViewModel {
     private ApparelRepo apparelRepo;
     private LiveData<List<Topwear>> allTopWear;
     private LiveData<List<Bottomwear>> allBottomWear;
-    public LiveData<Wishlist> wishData;
     public ApparelViewModel(Application application) {
         super(application);
         apparelRepo = new ApparelRepo(application);

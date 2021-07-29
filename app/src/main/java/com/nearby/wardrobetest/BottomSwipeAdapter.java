@@ -54,9 +54,4 @@ public class BottomSwipeAdapter extends PagerAdapter {
         return view == object;
     }
 
-    public void setList(List<Bottomwear> bottomwearList){
-        bottomwears.clear();
-        bottomwears.addAll(bottomwearList);
-    }
-
 }

@@ -42,7 +42,6 @@ public class TopSwipeAdapter extends PagerAdapter {
         collection.removeView((View) view);
     }
 
-
     @Override
     public int getCount() {
         return topwears.size();
@@ -51,11 +50,6 @@ public class TopSwipeAdapter extends PagerAdapter {
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view == object;
-    }
-
-    public void setList(List<Topwear> topwearList){
-        topwears.clear();
-        topwears.addAll(topwearList);
     }
 
 }
