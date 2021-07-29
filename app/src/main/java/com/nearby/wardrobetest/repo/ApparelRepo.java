@@ -2,6 +2,7 @@ package com.nearby.wardrobetest.repo;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -16,7 +17,6 @@ import java.util.List;
 public class ApparelRepo {
 
     private AllDao allDao;
-    public static Wishlist wishlistData;
     private LiveData<List<Topwear>> getTopWear;
     private LiveData<List<Bottomwear>> getBottomWear;
 
@@ -43,10 +43,8 @@ public class ApparelRepo {
         new DeleteWishAsyncTask(allDao).execute(wishlist);
     }
 
-    public Wishlist getWishlistData(int tid,int bid){
-        Integer[] intData = new Integer[]{tid,bid};
-        new GetWishAsyncTask(allDao).execute(intData);
-        return wishlistData;
+    public LiveData<Wishlist> getWishlistData(int tid,int bid){
+        return allDao.getWishData(tid,bid);
     }
 
     public LiveData<List<Topwear>> getTopWear() {
@@ -112,25 +110,5 @@ public class ApparelRepo {
             return null;
         }
     }
-
-    private static class GetWishAsyncTask extends AsyncTask<Integer,Void,Wishlist>{
-
-        private AllDao allDao;
-        public GetWishAsyncTask(AllDao allDao) {
-            this.allDao = allDao;
-        }
-
-        @Override
-        protected Wishlist doInBackground(Integer... integers) {
-            return allDao.getWishData(integers[0],integers[1]);
-        }
-
-        @Override
-        protected void onPostExecute(Wishlist wishlist) {
-            super.onPostExecute(wishlist);
-            wishlistData = wishlist;
-        }
-    }
-
 
 }

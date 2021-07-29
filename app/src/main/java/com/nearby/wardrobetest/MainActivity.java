@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     File mPhotoFile = null;
     private List<Topwear> topwearList;
     private List<Bottomwear> bottomwearList;
+    private Wishlist wishData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,76 +68,25 @@ public class MainActivity extends AppCompatActivity {
             binding.bottomPager.setAdapter(swipeAdapter2);
         });
 
-        binding.wishImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (topwearList.size() != 0 && bottomwearList.size() != 0) {
-                    int topPos = binding.topPager.getCurrentItem();
-                    int bottomPos = binding.bottomPager.getCurrentItem();
-                    if (viewModel.getWishlistData(topwearList.get(topPos).getId(),
-                    bottomwearList.get(bottomPos).getId()) == null){
-                        viewModel.insertWishlist(new Wishlist(0,
-                                topwearList.get(topPos).getId(),
-                                bottomwearList.get(bottomPos).getId()));
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
-                        Toast.makeText(getApplicationContext(),"Item added to wishlist",Toast.LENGTH_SHORT).show();
-                    }else {
-                        viewModel.deleteWishlist(new Wishlist(0,topwearList.get(topPos).getId(),
-                                bottomwearList.get(bottomPos).getId()));
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
-                        Toast.makeText(getApplicationContext(),"Item removed from wishlist",Toast.LENGTH_SHORT).show();
-                    }
+        binding.wishImg.setOnClickListener(view -> {
+            if (topwearList.size() != 0 && bottomwearList.size() != 0) {
+                int topPos = binding.topPager.getCurrentItem();
+                int bottomPos = binding.bottomPager.getCurrentItem();
+                if (wishData == null) {
+                    viewModel.insertWishlist(new Wishlist(0,
+                            topwearList.get(topPos).getId(),
+                            bottomwearList.get(bottomPos).getId()));
+                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
+                    Toast.makeText(getApplicationContext(), "Item added to wishlist", Toast.LENGTH_SHORT).show();
+                } else {
+                    viewModel.deleteWishlist(wishData);
+                    binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
+                    Toast.makeText(getApplicationContext(), "Item removed from wishlist", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        binding.topPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.e("pageSelect",position+" ");
-                if (bottomwearList.size() != 0){
-                    int bottomPos = binding.bottomPager.getCurrentItem();
-                    if (viewModel.getWishlistData(topwearList.get(position).getId(),
-                            bottomwearList.get(bottomPos).getId()) == null){
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
-                    }else {
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-
-        binding.bottomPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.e("pageSelectb",position+" ");
-                if (topwearList.size() != 0){
-                    int topPos = binding.topPager.getCurrentItem();
-                    if (viewModel.getWishlistData(topwearList.get(topPos).getId(),
-                            bottomwearList.get(position).getId()) == null){
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
-                    }else {
-                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
+        pageListener();
 
         binding.topImgPager.setOnClickListener(view -> {
             ImageDialog();
@@ -162,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 topwearList = topwears;
                 swipeAdapter = new TopSwipeAdapter(getApplicationContext(),topwearList);
                 binding.topPager.setAdapter(swipeAdapter);
+                getWishData();
             }
         });
 
@@ -170,8 +122,56 @@ public class MainActivity extends AppCompatActivity {
                 bottomwearList = bottomwears;
                 swipeAdapter2 = new BottomSwipeAdapter(getApplicationContext(),bottomwearList);
                 binding.bottomPager.setAdapter(swipeAdapter2);
+                getWishData();
             }
         });
+    }
+
+    private void pageListener(){
+        binding.topPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+            @Override
+            public void onPageSelected(int position) {
+                getWishData();
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+        binding.bottomPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+            @Override
+            public void onPageSelected(int position) {
+                getWishData();
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
+
+    private void getWishData(){
+        if (topwearList.size() != 0 && bottomwearList.size() != 0){
+            int topPos = binding.topPager.getCurrentItem();
+            int bottomPos = binding.bottomPager.getCurrentItem();
+            viewModel.getWishlistData(topwearList.get(topPos).getId(),
+                    bottomwearList.get(bottomPos).getId()).observe(MainActivity.this, new Observer<Wishlist>() {
+                @Override
+                public void onChanged(Wishlist wishlist) {
+                    wishData = wishlist;
+                    if (wishlist == null){
+                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.notwish));
+                    }else {
+                        binding.wishImg.setImageDrawable(getResources().getDrawable(R.drawable.wish));
+                    }
+                }
+            });
+        }
     }
 
     private void ImageDialog(){

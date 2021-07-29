@@ -30,5 +30,5 @@ public interface AllDao {
     LiveData<List<Bottomwear>> getBottomWear();
 
     @Query("Select * from Wishlist where topId = :tid and bottomId = :bid")
-    Wishlist getWishData(int tid, int bid);
+    LiveData<Wishlist> getWishData(int tid, int bid);
 }

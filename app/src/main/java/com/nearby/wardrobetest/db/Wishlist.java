@@ -13,7 +13,7 @@ public class Wishlist {
 
     private int bottomId;
 
-   /* public Wishlist(int topId, int bottomId) {
+  /*  public Wishlist(int topId, int bottomId) {
         this.topId = topId;
         this.bottomId = bottomId;
     }*/

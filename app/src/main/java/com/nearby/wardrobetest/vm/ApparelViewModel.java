@@ -17,6 +17,7 @@ public class ApparelViewModel extends AndroidViewModel {
     private ApparelRepo apparelRepo;
     private LiveData<List<Topwear>> allTopWear;
     private LiveData<List<Bottomwear>> allBottomWear;
+    public LiveData<Wishlist> wishData;
     public ApparelViewModel(Application application) {
         super(application);
         apparelRepo = new ApparelRepo(application);
@@ -40,7 +41,7 @@ public class ApparelViewModel extends AndroidViewModel {
         apparelRepo.deleteWishlist(wishlist);
     }
 
-    public Wishlist getWishlistData(int tid,int bid){
+    public LiveData<Wishlist> getWishlistData(int tid,int bid){
         return apparelRepo.getWishlistData(tid,bid);
     }
 
